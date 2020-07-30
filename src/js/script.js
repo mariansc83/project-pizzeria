@@ -152,34 +152,38 @@
 
       /* START LOOP: for each paramId in thisProduct.data.params */
       /* save the element in thisProduct.data.params with key paramId as const param */
-      for (let paramId in thisProduct.data.params) {
-        const param = thisProduct.data.params[paramId];
-        console.log(param);
-        /* START LOOP: for each optionId in param.options */
-        /* save the element in param.options with key optionId as const option */
-        for (let optionId in param.options) {
-          const option = param.options[optionId];
-          console.log(option);
-          /* START IF: if option is selected and option is not default */
-          const optionSelected = formData.hasOwnProperty(paramId) && formData[paramId].indexOf(optionId) > -1;
-          if (optionSelected && !option.default) {
-            /* add price of option to variable price */
-            price += option.price;
-            console.log(price);
-            /* END IF: if option is selected and option is not default */
-            /* START ELSE IF: if option is not selected and option is default */
-          } else if (!optionSelected && option.default) {
-            /* deduct price of option from price */
-            price -= option.price;
-            console.log(price);
+      if (thisProduct.data.params) { // jezeli produkt ma params, wtedy zrob petle
+        for (let paramId in thisProduct.data.params) { // iteracja po dzieciach params
+          const param = thisProduct.data.params[paramId];
+          console.log(param);
+          console.log(paramId);
+          /* START LOOP: for each optionId in param.options */
+          /* save the element in param.options with key optionId as const option */
+          for (let optionId in param.options) {
+            const option = param.options[optionId];
+            console.log(option);
+            console.log(optionId);
+            /* START IF: if option is selected and option is not default */
+            const optionSelected = formData.hasOwnProperty(paramId) && formData[paramId].indexOf(optionId) > -1;
+            if (optionSelected && !option.default) {
+              /* add price of option to variable price */
+              price += option.price;
+              console.log(option.price);
+              /* END IF: if option is selected and option is not default */
+              /* START ELSE IF: if option is not selected and option is default */
+            } else if (!optionSelected && option.default) {
+              /* deduct price of option from price */
+              price -= option.price;
+              console.log(option.price);
+            }
+            /* END ELSE IF: if option is not selected and option is default */
           }
-          /* END ELSE IF: if option is not selected and option is default */
+          /* END LOOP: for each optionId in param.options */
         }
-        /* END LOOP: for each optionId in param.options */
+        /* END LOOP: for each paramId in thisProduct.data.params */
+        /* set the contents of thisProduct.priceElem to be the value of variable price */
       }
-      /* END LOOP: for each paramId in thisProduct.data.params */
-      /* set the contents of thisProduct.priceElem to be the value of variable price */
-      thisProduct.priceElem = price;
+      thisProduct.priceElem.innerHTML = price;
     }
   }
 
