@@ -137,7 +137,7 @@
         thisProduct.processOrder();
       });
     }
-
+    // Muszę miec jakiś bląd w poniższej metodzie processOrder
     processOrder() {
       const thisProduct = this;
       console.log(thisProduct);
