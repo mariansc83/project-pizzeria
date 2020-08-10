@@ -366,10 +366,10 @@
     add(menuProduct) {
       const thisCart = this;
 
-      const generatedHTML = templates.cartProduct(thisCart.menuProduct);
+      const generatedHTML = templates.cartProduct(menuProduct);
 
       const generatedDOM = utils.createDOMFromHTML(generatedHTML);
-      thisCart.dom.productList += generatedDOM;
+      thisCart.dom.productList.appendChild(generatedDOM);
 
       console.log('adding product', menuProduct);
       console.log(generatedHTML);
