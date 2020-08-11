@@ -327,7 +327,9 @@
     announce() {
       const thisWidget = this;
 
-      const event = new Event('updated');
+      const event = new CustomEvent('updated', {
+        bubbles: true
+      });
       thisWidget.element.dispatchEvent(event);
     }
   }
@@ -345,6 +347,7 @@
       thisCart.getElements(element);
       // console.log('new Cart', thisCart);
       thisCart.initActions(element);
+      // thisCart.update();
     }
 
     getElements(element) {
@@ -352,10 +355,19 @@
 
       thisCart.dom = {};
 
-      thisCart.dom.wrappper = element;
+      thisCart.dom.wrapper = element;
       thisCart.dom.toggleTrigger = element.querySelector(select.cart.toggleTrigger);
       thisCart.dom.productList = element.querySelector(select.cart.productList);
+      // thisCart.dom.totalNumber = element.querySelector(select.cart.totalNumber);
+      // thisCart.dom.totalPrice = element.querySelector(select.cart.totalPrice);
+      // thisCart.dom.subtotalPrice = element.querySelector(select.cart.subtotalPrice);
+      // thisCart.dom.deliveryFee = element.querySelector(select.cart.deliveryFee);
       // console.log(thisCart.dom.productList);
+      thisCart.renderTotalsKeys = ['totalNumber', 'totalPrice', 'subtotalPrice', 'deliveryFee'];
+      // console.log(thisCart.renderTotalsKeys);
+      for (let key of thisCart.renderTotalsKeys) {
+        thisCart.dom[key] = thisCart.dom.wrapper.querySelectorAll(select.cart[key]);
+      }
     }
 
     initActions(element) {
@@ -363,7 +375,10 @@
 
       thisCart.dom.toggleTrigger.addEventListener('click', function () {
         element.classList.toggle(classNames.cart.wrapperActive);
+      });
 
+      thisCart.dom.productList.addEventListener('updated', function () {
+        thisCart.update();
       });
     }
 
@@ -396,6 +411,12 @@
       thisCart.totalPrice = thisCart.subtotalPrice + thisCart.deliveryFee;
       console.log(thisCart.totalNumber);
       console.log(thisCart.subtotalPrice);
+
+      for (let key of thisCart.renderTotalsKeys) {
+        for (let elem of thisCart.dom[key]) {
+          elem.innerHTML = thisCart[key];
+        }
+      }
     }
   }
 
