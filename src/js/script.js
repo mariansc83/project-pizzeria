@@ -77,6 +77,11 @@
       defaultDeliveryFee: 20,
     },
     // CODE ADDED END
+    db: {
+      url: '//localhost:3131',
+      product: 'product',
+      order: 'order',
+    },
   };
 
   const templates = {
@@ -358,16 +363,42 @@
       thisCart.dom.wrapper = element;
       thisCart.dom.toggleTrigger = element.querySelector(select.cart.toggleTrigger);
       thisCart.dom.productList = element.querySelector(select.cart.productList);
-      // thisCart.dom.totalNumber = element.querySelector(select.cart.totalNumber);
-      // thisCart.dom.totalPrice = element.querySelector(select.cart.totalPrice);
-      // thisCart.dom.subtotalPrice = element.querySelector(select.cart.subtotalPrice);
-      // thisCart.dom.deliveryFee = element.querySelector(select.cart.deliveryFee);
       // console.log(thisCart.dom.productList);
       thisCart.renderTotalsKeys = ['totalNumber', 'totalPrice', 'subtotalPrice', 'deliveryFee'];
       // console.log(thisCart.renderTotalsKeys);
       for (let key of thisCart.renderTotalsKeys) {
         thisCart.dom[key] = thisCart.dom.wrapper.querySelectorAll(select.cart[key]);
       }
+
+      thisCart.dom.form = element.querySelector(select.cart.form);
+      console.log(thisCart.dom.form);
+      thisCart.dom.phone = element.querySelector(select.cart.phone);
+      console.log(thisCart.dom.phone);
+      thisCart.dom.address = element.querySelector(select.cart.address);
+      console.log(thisCart.dom.address);
+      /* czy ponizsze dodac w ten sposob? */
+      // thisCart.dom.totalNumber = element.querySelector(select.cart.totalNumber);
+      // console.log(thisCart.dom.totalNumber);
+      // thisCart.dom.subtotalPrice = element.querySelector(select.cart.subtotalPrice);
+      // console.log(thisCart.dom.subtotalPrice);
+      // thisCart.dom.totalPrice = element.querySelector(select.cart.totalPrice);
+      // console.log(thisCart.dom.totalPrice);
+
+      const payload = {
+        phone: 'test phone',
+        address: 'test address',
+        totalNumber: thisCart.totalNumber,
+        subtotalPrice: thisCart.subtotalPrice,
+        totalPrice: thisCart.totalPrice,
+        deliveryFee: thisCart.deliveryFee,
+        products: [],
+      };
+
+      for (let product of thisCart.products) {
+        product.getData();
+      }
+
+      // payload.products.push(); // musze napisac metode CartProduct.getData() i dodac wynik zwracany ta metoda do tablicy payload.product
     }
 
     initActions(element) {
@@ -384,7 +415,38 @@
       thisCart.dom.productList.addEventListener('remove', function () {
         thisCart.remove(event.detail.cartProduct);
       });
+
+      thisCart.dom.form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        thisCart.sendOrder();
+      });
     }
+
+    sendOrder() {
+      const thisCart = this;
+      const url = settings.db.url + '/' + settings.db.order;
+
+      const payload = {
+        address: 'test',
+        totalPrice: thisCart.totalPrice,
+      };
+
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      };
+
+      fetch(url, options)
+        .then(function (response) {
+          return response.json();
+        }).then(function (parsedResponse) {
+          console.log('parsedResponse', parsedResponse);
+        });
+    }
+
 
     add(menuProduct) {
       const thisCart = this;
@@ -509,13 +571,31 @@
       const thisApp = this;
       // console.log('thisApp.data:', thisApp.data);
       for (let productData in thisApp.data.products) {
-        new Product(productData, thisApp.data.products[productData]);
+        new Product(thisApp.data.products[productData].id, thisApp.data.products[productData]);
         // console.log(thisApp.data.products);
       }
     },
     initData: function () {
       const thisApp = this;
-      thisApp.data = dataSource;
+      thisApp.data = {};
+
+      const url = settings.db.url + '/' + settings.db.product;
+
+      fetch(url)
+        .then(function (rawResponse) {
+          return rawResponse.json();
+        })
+        .then(function (parsedResponse) {
+          console.log('parsedResponse', parsedResponse);
+
+          /* save parsedResponse as thisApp.data.products */
+          thisApp.data.products = parsedResponse;
+
+          /* execute initMenu method */
+          thisApp.initMenu();
+        });
+
+      console.log('thisApp.data', JSON.stringify(thisApp.data));
     },
     initCart: function () {
       const thisApp = this;
@@ -530,10 +610,9 @@
       console.log('settings:', settings);
       console.log('templates:', templates);
       thisApp.initData();
-      thisApp.initMenu();
+      // thisApp.initMenu(); // kasujemy wywolanie tej metody
       thisApp.initCart();
     },
   };
-  // app.cart();
   app.init();
 }
