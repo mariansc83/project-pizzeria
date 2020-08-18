@@ -383,22 +383,6 @@
       // console.log(thisCart.dom.subtotalPrice);
       // thisCart.dom.totalPrice = element.querySelector(select.cart.totalPrice);
       // console.log(thisCart.dom.totalPrice);
-
-      const payload = {
-        phone: 'test phone',
-        address: 'test address',
-        totalNumber: thisCart.totalNumber,
-        subtotalPrice: thisCart.subtotalPrice,
-        totalPrice: thisCart.totalPrice,
-        deliveryFee: thisCart.deliveryFee,
-        products: [],
-      };
-
-      for (let product of thisCart.products) {
-        product.getData();
-      }
-
-      // payload.products.push(); // musze napisac metode CartProduct.getData() i dodac wynik zwracany ta metoda do tablicy payload.product
     }
 
     initActions(element) {
@@ -427,9 +411,18 @@
       const url = settings.db.url + '/' + settings.db.order;
 
       const payload = {
-        address: 'test',
+        phone: thisCart.dom.phone.value,
+        address: thisCart.dom.address.value,
+        totalNumber: thisCart.totalNumber,
+        subtotalPrice: thisCart.subtotalPrice,
         totalPrice: thisCart.totalPrice,
+        deliveryFee: thisCart.deliveryFee,
+        products: [],
       };
+
+      for (let product of thisCart.products) {
+        payload.products.push(product.getData());
+      }
 
       const options = {
         method: 'POST',
@@ -563,6 +556,20 @@
         event.preventDefault();
         thisCartProduct.remove();
       });
+    }
+
+    getData() {
+      const thisCartProduct = this;
+
+      const orderedProductData = {
+        id: thisCartProduct.id,
+        amount: thisCartProduct.amount,
+        price: thisCartProduct.price,
+        priceSingle: thisCartProduct.priceSingle,
+        params: thisCartProduct.params
+      };
+
+      return orderedProductData;
     }
   }
 
