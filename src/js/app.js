@@ -5,7 +5,7 @@ import {
 } from './settings.js';
 import Product from './components/Product.js';
 import Cart from './components/Cart.js';
-import Booking from '.components/Booking.js';
+import Booking from './components/Booking.js';
 
 
 const app = {
